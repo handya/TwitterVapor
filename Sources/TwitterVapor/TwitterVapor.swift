@@ -12,7 +12,7 @@ public class TwitterVapor {
 
     // MARK: - Properties
 
-    private let credentials: TwitterVaporCredentials
+    private let credentials: Credentials
 
     private let client: Client
 
@@ -20,7 +20,7 @@ public class TwitterVapor {
 
     // MARK: - Lifecycle
 
-    init(credentials: TwitterVaporCredentials, client: Client) {
+    init(credentials: Credentials, client: Client) {
         self.credentials = credentials
         self.client = client
     }
@@ -32,13 +32,41 @@ public class TwitterVapor {
         let signature = OhhAuth.calculateSignature(url: url,
                                                    method: "POST",
                                                    parameter: [:],
-                                                   consumerCredentials: credentials.consumer.asOhhAuth,
-                                                   userCredentials: credentials.user.asOhhAuth)
+                                                   consumerCredentials: credentials.consumer.ohhAuthCredentials,
+                                                   userCredentials: credentials.user.ohhAuthCredentials)
 
-        var headers: HTTPHeaders = HTTPHeaders()
+        var headers: HTTPHeaders = .init()
         headers.add(name: "Authorization", value: signature)
         headers.add(name: "Content-Type", value: "application/x-www-form-urlencoded")
         return client.post(URI(string: url.absoluteString), headers: headers)
+    }
+}
+
+// MARK: - Credentials
+
+public extension TwitterVapor {
+    struct Credentials {
+        public let consumer: Credential
+        public let user: Credential
+
+        public init(consumer: Credential, user: Credential) {
+            self.consumer = consumer
+            self.user = user
+        }
+    }
+
+    struct Credential {
+        public let key: String
+        public let secret: String
+
+        public init(key: String, secret: String) {
+            self.key = key
+            self.secret = secret
+        }
+
+        var ohhAuthCredentials: OhhAuth.Credentials {
+            return (key: key, secret: secret)
+        }
     }
 }
 

@@ -9,10 +9,10 @@ extension Application {
         let application: Application
 
         struct ConfigurationKey: StorageKey {
-            typealias Value = TwitterVaporCredentials
+            typealias Value = TwitterVapor.Credentials
         }
 
-        public var credentials: TwitterVaporCredentials? {
+        public var credentials: TwitterVapor.Credentials? {
             get {
                 self.application.storage[ConfigurationKey.self]
             }
